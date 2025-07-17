@@ -34,7 +34,11 @@ for message in st.session_state.messages:
 
 # Process and store Query and Response
 def llm_function(query):
-    response = model.generate_content(query)
+    # Generate streaming response
+    response = model.generate_content(
+        query,
+        stream=True  # Enable streaming
+    )
 
     # Storing the User Message
     st.session_state.messages.append(
@@ -44,11 +48,24 @@ def llm_function(query):
         }
     )
 
-    # Storing the assistant Message
+    # Display streaming response with typing effect
+    with st.chat_message("assistant"):
+        # Create a generator function for streaming
+        def response_generator():
+            full_response = ""
+            for chunk in response:
+                if chunk.text:
+                    full_response += chunk.text
+                    yield chunk.text
+        
+        # Stream the response with typing effect
+        full_response = st.write_stream(response_generator())
+
+    # Store the complete assistant message
     st.session_state.messages.append(
         {
             "role":"assistant",
-            "content": response.text
+            "content": full_response
         }
     )
         
@@ -57,5 +74,8 @@ query = st.chat_input("What's up?")
 
 # Calling the Function when Input is Provided
 if query:
+    # Display user message immediately
+    with st.chat_message("user"):
+        st.markdown(query)
+    
     llm_function(query)
-    st.rerun()  # Force immediate refresh to show new messages
