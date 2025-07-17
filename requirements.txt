@@ -1,2 +1,5 @@
 google-generativeai
 python-dotenv
+streamlit
+pillow
+langchain-google-genai

@@ -72,6 +72,7 @@ def llm_function(query):
 # Accept user input
 query = st.chat_input("What's up?")
 
+
 # Calling the Function when Input is Provided
 if query:
     # Display user message immediately
